@@ -7,3 +7,14 @@ LABEL NAME="python-3.8" \
 # Set HTTP(S) proxy server:
 ENV http_proxy http://host.docker.internal:3128
 ENV https_proxy http://host.docker.internal:3128
+# Set the working directory inside the Docker image
+WORKDIR /workspace
+
+# Copy everything except for files listed in .dockerignore
+COPY . /workspace
+
+# Install dependencies
+RUN pip install -r requirements.txt
+
+# Install the app
+RUN pip install -e .
