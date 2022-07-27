@@ -1,27 +1,34 @@
-pipeline {	
+pipeline {
     agent any
-    stages {
-        stage ('Build') {
-            agent { dockerfile true }
-            environment {
-	            http_proxy = 'http://127.0.0.1:3128/'
-	            https_proxy = 'http://127.0.0.1:3128/'
-   	            ftp_proxy = 'http://127.0.0.1:3128/'
-	            socks_proxy = 'socks://127.0.0.1:3128/'
+    environment {
+	    http_proxy = 'http://127.0.0.1:3128/'
+	    https_proxy = 'http://127.0.0.1:3128/'
+        ftp_proxy = 'http://127.0.0.1:3128/'
+        socks_proxy = 'socks://127.0.0.1:3128/'
+    }
+       stages {
+
+
+        stage("install pip dependencies") {
+            agent { 
+                docker {
+                    label "docker" 
+                    image "python:3.8"
+                }   
             }
             steps {
-                echo "Build"
+                withEnv(["HOME=${env.WORKSPACE}"]) {
+                    sh "pip install virtualenv"
+                    sh "virtualenv venv"
+                    sh "pip install -r requirements.txt "
+
+                }
             }
         }
-        stage('test') {
+        stage ('Test' {
             steps {
-	         sh 'python3 -m pytest'
+                sh 'python3 -m pytest'
             }
-	      }
-        stage('Archive Artifacts') {
-            steps {
-	              archiveArtifacts artifacts: '/workspace/htmlcov/'
-	          }
-	      }
-    }	
+        })
+    }
 }
