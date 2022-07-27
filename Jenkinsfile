@@ -15,7 +15,7 @@ pipeline {
 	}
 	stage('Archive Artifacts') {
             steps {
-	         archiveArtifacts artifacts: 'htmlcov/'
+	         archiveArtifacts artifacts: 'coverage/'
 	    }
 	}
     }	
