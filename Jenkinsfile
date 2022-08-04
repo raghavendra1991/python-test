@@ -1,21 +1,28 @@
 pipeline {
-  agent none
+  agent {
+      label 'slave'
+    }
   stages {
+      stage('CleanUp WorkSpace & Git Checkout') {
+          steps {
+              // Clean before build
+              cleanWs()
+              // We need to explicitly checkout from SCM here
+              checkout scm
+           }
+       }	
       stage('Build & Test') {
 	   agent {
     	      docker {
       	          image 'pythontest:latest'
-                  label 'slave'
+                  reuseNode 'true'
     	      }
   	   }
 	   steps {
 	      sh 'python3 -m pytest'
 	   }
        }
-       stage('Code Analysis & Deploy Atrifacts') {
-	   agent {
-      	      label 'slave'
-    	   }
+       stage('Code Analysis') {
 	   environment {
 	      scannerHome = tool 'SonarQube Scanner'
 	   }
@@ -27,9 +34,6 @@ pipeline {
            }
         }
         stage('Deploy Atrifacts') {
-           agent {
-      	       label 'slave'
-    	   }
            steps {
                rtUpload (
                    serverId: 'JFrog',
@@ -45,4 +49,3 @@ pipeline {
             }
         }
     }
-} 
