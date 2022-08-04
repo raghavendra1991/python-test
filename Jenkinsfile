@@ -3,8 +3,8 @@ pipeline {
   stages {
       stage('Build & Test') {
 	   agent {
-    	      dockerfile {
-      	          filename 'Dockerfile'
+    	      docker {
+      	          image 'pythontest:latest'
                   label 'slave'
     	      }
   	   }
